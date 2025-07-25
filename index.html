@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System - TypeScript</title>
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 User Management System</h1>
+            <p>Comprehensive TypeScript implementation with interfaces, classes, and type safety</p>
+        </header>
+
+        <main>
+            <div class="system-layout">
+                <!-- User Creation Form -->
+                <section class="form-section">
+                    <div class="card">
+                        <h2>📝 Create New User</h2>
+                        
+                        <form id="userForm" class="user-form">
+                            <div class="form-group">
+                                <label for="username">Username *</label>
+                                <input type="text" id="username" name="username" required 
+                                       placeholder="Enter username">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required 
+                                       placeholder="user@example.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Password *</label>
+                                <input type="password" id="password" name="password" required 
+                                       placeholder="Enter password">
+                                <small id="passwordHint" class="password-hint">
+                                    Regular users: 8+ characters, Admin: 12+ characters
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="role">Role</label>
+                                <select id="role" name="role">
+                                    <option value="user">👤 User</option>
+                                    <option value="admin">👑 Admin</option>
+                                    <option value="guest">👥 Guest</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="birthDate">Birth Date (optional)</label>
+                                <input type="date" id="birthDate" name="birthDate">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address">Address (optional)</label>
+                                <input type="text" id="address" name="address" 
+                                       placeholder="Enter address">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="isActive" name="isActive" checked>
+                                    <span class="checkmark"></span>
+                                    Active User
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn-primary">
+                                ✨ Create User
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- User Display Section -->
+                <section class="display-section">
+                    <div class="card">
+                        <div class="section-header">
+                            <h2>👥 Created Users</h2>
+                            <div class="user-stats">
+                                <span id="userCount" class="stat-badge">0 users</span>
+                                <button id="clearAll" class="btn-secondary">🗑️ Clear All</button>
+                            </div>
+                        </div>
+                        
+                        <div id="userList" class="user-list">
+                            <div class="empty-state">
+                                <p>🚀 No users created yet. Create your first user!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TypeScript Concepts Display -->
+            <section class="concepts-section">
+                <div class="card">
+                    <h2>🎯 TypeScript Concepts Implemented</h2>
+                    <div class="concepts-grid">
+                        <div class="concept-item">
+                            <h3>📋 Interfaces</h3>
+                            <p>User interface with readonly id, optional properties, and union types</p>
+                        </div>
+                        <div class="concept-item">
+                            <h3>🔗 Type Extensions</h3>
+                            <p>UserProfile extends User with additional properties</p>
+                        </div>
+                        <div class="concept-item">
+                            <h3>🏗️ Classes & OOP</h3>
+                            <p>UserAccount and AdminUser classes with inheritance</p>
+                        </div>
+                        <div class="concept-item">
+                            <h3>🛡️ Type Guards</h3>
+                            <p>Runtime type checking for User vs UserProfile</p>
+                        </div>
+                        <div class="concept-item">
+                            <h3>🔒 Access Modifiers</h3>
+                            <p>Private password, public properties, readonly id</p>
+                        </div>
+                        <div class="concept-item">
+                            <h3>🎭 Type Assertions</h3>
+                            <p>DOM element type assertions for form handling</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="./src/main.ts"></script>
+</body>
+</html>
