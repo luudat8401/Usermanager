@@ -108,15 +108,123 @@ function isUserProfile(user: User | UserProfile): user is UserProfile {
 // Storage for created users
 const createdUsers: (UserAccount | AdminUser)[] = []
 
+// Helper function to get role icon
+function getRoleIcon(role: string): string {
+  switch (role) {
+    case "admin":
+      return "👑"
+    case "user":
+      return "👤"
+    case "guest":
+      return "👥"
+    default:
+      return "❓"
+  }
+}
+
+// Notification system
+function showNotification(message: string, type: "success" | "error" | "info"): void {
+  const notification = document.createElement("div")
+  notification.className = `notification ${type}`
+  notification.textContent = message
+
+  document.body.appendChild(notification)
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.remove()
+  }, 3000)
+}
+
+// Display users function
+function displayUsers(): void {
+  const userList = document.getElementById("userList") as HTMLDivElement
+  if (!userList) return
+
+  if (createdUsers.length === 0) {
+    userList.innerHTML = `
+      <div class="empty-state">
+        <p>🚀 No users created yet. Create your first user!</p>
+      </div>
+    `
+    return
+  }
+
+  userList.innerHTML = ""
+
+  createdUsers.forEach((user) => {
+    const userDiv = document.createElement("div")
+    userDiv.className = `user-item ${user.role}`
+
+    const isAdmin = user instanceof AdminUser
+    const permissions = isAdmin ? (user as AdminUser).permissions : []
+
+    const userInfo = formatUserInfo(user)
+
+    userDiv.innerHTML = `
+      <div class="user-header">
+        <div class="user-title">
+          ${getRoleIcon(user.role)} ${user.username}
+        </div>
+        <span class="role-badge ${user.role}">${user.role}</span>
+      </div>
+      
+      <div class="user-details">
+        <div class="user-detail">
+          <strong>ID:</strong> <span>#${user.id}</span>
+        </div>
+        <div class="user-detail">
+          <strong>Email:</strong> <span>${user.email}</span>
+        </div>
+        <div class="user-detail">
+          <strong>Status:</strong> 
+          <span style="color: ${user.isActive ? "#27ae60" : "#e74c3c"}">
+            ${user.isActive ? "✅ Active" : "❌ Inactive"}
+          </span>
+        </div>
+        <div class="user-detail">
+          <strong>Password:</strong> <span>${user.getPasswordMask()} (${user.getPasswordLength()} chars)</span>
+        </div>
+        ${
+          isAdmin
+            ? `
+          <div class="user-detail" style="grid-column: 1 / -1;">
+            <strong>Permissions:</strong> 
+            <span>${permissions.map((p) => `🔑 ${p}`).join(", ")}</span>
+          </div>
+        `
+            : ""
+        }
+      </div>
+      
+      <div class="user-info">
+        📋 ${userInfo}
+      </div>
+    `
+
+    userList.appendChild(userDiv)
+  })
+}
+
+// Update user count
+function updateUserCount(): void {
+  const userCount = document.getElementById("userCount") as HTMLSpanElement
+  if (userCount) {
+    const count = createdUsers.length
+    const adminCount = createdUsers.filter((u) => u.role === "admin").length
+    const userCountRegular = createdUsers.filter((u) => u.role === "user").length
+    const guestCount = createdUsers.filter((u) => u.role === "guest").length
+
+    userCount.textContent = `${count} users (👑 ${adminCount} admins, 👤 ${userCountRegular} users, 👥 ${guestCount} guests)`
+  }
+}
+
 // Task 7 & 8: Lấy phần tử DOM và xử lý form submit
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("userForm") as HTMLFormElement
   const emailInput = document.querySelector("#email") as HTMLInputElement
-  const userList = document.getElementById("userList") as HTMLDivElement
-  const userCount = document.getElementById("userCount") as HTMLSpanElement
   const clearAllBtn = document.getElementById("clearAll") as HTMLButtonElement
   const roleSelect = document.getElementById("role") as HTMLSelectElement
-  const passwordInput = document.getElementById("password") as HTMLInputElement
   const passwordHint = document.getElementById("passwordHint") as HTMLElement
 
   // Update password hint based on role selection
@@ -229,150 +337,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  // Display users function
-  function displayUsers(): void {
-    if (!userList) return
-
-    if (createdUsers.length === 0) {
-      userList.innerHTML = `
-        <div class="empty-state">
-          <p>🚀 No users created yet. Create your first user!</p>
-        </div>
-      `
-      return
-    }
-
-    userList.innerHTML = ""
-
-    createdUsers.forEach((user, index) => {
-      const userDiv = document.createElement("div")
-      userDiv.className = `user-item ${user.role}`
-
-      const isAdmin = user instanceof AdminUser
-      const permissions = isAdmin ? (user as AdminUser).permissions : []
-
-      // Create UserProfile if we have additional data (simulated)
-      const userInfo = formatUserInfo(user)
-
-      userDiv.innerHTML = `
-        <div class="user-header">
-          <div class="user-title">
-            ${getRoleIcon(user.role)} ${user.username}
-          </div>
-          <span class="role-badge ${user.role}">${user.role}</span>
-        </div>
-        
-        <div class="user-details">
-          <div class="user-detail">
-            <strong>ID:</strong> <span>#${user.id}</span>
-          </div>
-          <div class="user-detail">
-            <strong>Email:</strong> <span>${user.email}</span>
-          </div>
-          <div class="user-detail">
-            <strong>Status:</strong> 
-            <span style="color: ${user.isActive ? "#27ae60" : "#e74c3c"}">
-              ${user.isActive ? "✅ Active" : "❌ Inactive"}
-            </span>
-          </div>
-          <div class="user-detail">
-            <strong>Password:</strong> <span>${user.getPasswordMask()} (${user.getPasswordLength()} chars)</span>
-          </div>
-          ${
-            isAdmin
-              ? `
-            <div class="user-detail" style="grid-column: 1 / -1;">
-              <strong>Permissions:</strong> 
-              <span>${permissions.map((p) => `🔑 ${p}`).join(", ")}</span>
-            </div>
-          `
-              : ""
-          }
-        </div>
-        
-        <div class="user-info">
-          📋 ${userInfo}
-        </div>
-      `
-
-      userList.appendChild(userDiv)
-    })
-  }
-
-  // Update user count
-  function updateUserCount(): void {
-    if (userCount) {
-      const count = createdUsers.length
-      const adminCount = createdUsers.filter((u) => u.role === "admin").length
-      const userCountRegular = createdUsers.filter((u) => u.role === "user").length
-      const guestCount = createdUsers.filter((u) => u.role === "guest").length
-
-      userCount.textContent = `${count} users (👑 ${adminCount} admins, 👤 ${userCountRegular} users, 👥 ${guestCount} guests)`
-    }
-  }
-
-  // Helper function to get role icon
-  function getRoleIcon(role: string): string {
-    switch (role) {
-      case "admin":
-        return "👑"
-      case "user":
-        return "👤"
-      case "guest":
-        return "👥"
-      default:
-        return "❓"
-    }
-  }
-
-  // Notification system
-  function showNotification(message: string, type: "success" | "error" | "info"): void {
-    const notification = document.createElement("div")
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      color: white;
-      font-weight: 500;
-      z-index: 1000;
-      animation: slideIn 0.3s ease;
-      max-width: 300px;
-    `
-
-    switch (type) {
-      case "success":
-        notification.style.background = "#27ae60"
-        break
-      case "error":
-        notification.style.background = "#e74c3c"
-        break
-      case "info":
-        notification.style.background = "#3498db"
-        break
-    }
-
-    notification.textContent = message
-    document.body.appendChild(notification)
-
-    // Add slide-in animation
-    const style = document.createElement("style")
-    style.textContent = `
-      @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-    `
-    document.head.appendChild(style)
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-      notification.remove()
-      style.remove()
-    }, 3000)
-  }
-
   // Initialize display
   displayUsers()
   updateUserCount()
@@ -389,7 +353,3 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("   ✅ Proper access modifiers (private, public, readonly)")
   console.log("   ✅ Function overloading and generic types")
 })
-
-// Export types for potential use in other modules
-export type { User, UserProfile }
-export { UserAccount, AdminUser, createUser, formatUserInfo, isUserProfile }
